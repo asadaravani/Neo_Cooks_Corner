@@ -1,4 +1,13 @@
 package kg.beganov.CooksCorner.service;
 
-public class RecipeService {
+import kg.beganov.CooksCorner.dto.response.RecipePreview;
+
+import java.util.List;
+
+public interface RecipeService {
+    List<RecipePreview> getBreakfastRecipes();
+
+    List<RecipePreview> getLunchRecipes();
+
+    List<RecipePreview> getDinnerRecipes();
 }
