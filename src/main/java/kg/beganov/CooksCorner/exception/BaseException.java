@@ -1,4 +1,7 @@
 package kg.beganov.CooksCorner.exception;
 
-public class BaseException {
+public class BaseException extends RuntimeException{
+    public BaseException(String message) {
+
+    }
 }
