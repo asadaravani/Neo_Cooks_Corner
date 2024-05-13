@@ -1,5 +1,10 @@
 package kg.beganov.CooksCorner.config;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -8,14 +13,29 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 @Configuration
+@RequiredArgsConstructor
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class JavaMailSenderConfig {
+
+    @Value("${mail.host}")
+    String host;
+    @Value("${mail.port}")
+    String port;
+    @Value("${mail.username}")
+    String username;
+    @Value("${mail.password}")
+    String password;
+    @Value("${mail.link-api}")
+    String linkApi;
+
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
-        mailSender.setUsername("beganov.asadi@gmail.com");
-        mailSender.setPassword("ffsf hyzl lkjn xuwl");
+        mailSender.setHost(host);
+        mailSender.setPort(Integer.parseInt(port));
+        mailSender.setUsername(username);
+        mailSender.setPassword(password);
 
         Properties properties = mailSender.getJavaMailProperties();
         properties.put("mail.smtp.auth", "true");
