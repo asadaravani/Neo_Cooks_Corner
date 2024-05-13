@@ -1,5 +1,6 @@
 package kg.beganov.CooksCorner.service.impl;
 
+import kg.beganov.CooksCorner.config.JavaMailSenderConfig;
 import kg.beganov.CooksCorner.config.JwtUtil;
 import kg.beganov.CooksCorner.dto.request.LoginRequest;
 import kg.beganov.CooksCorner.dto.request.RegisterRequest;
@@ -33,13 +34,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     AuthenticationManager authenticationManager;
     EmailSenderService emailSenderService;
     ConfirmationTokenService confirmationTokenService;
-    String dropletApi = "165.22.72.60";
+    JavaMailSenderConfig mailSenderConfig;
 
     @Override
-    public AuthenticationResponse authenticate(LoginRequest loginRequest) throws UserNotFoundException, UserNotVerifiedException, InvalidDataProvidedException {
+    public AuthenticationResponse login(LoginRequest loginRequest) throws UserNotFoundException, UserNotVerifiedException, InvalidDataProvidedException {
         String emailToLowercase = loginRequest.getEmail().toLowerCase();
         AppUser user = appUserRepository.findUserByEmail(emailToLowercase)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
         if(!user.isEmailVerified()){
             ConfirmationToken confirmationToken = new ConfirmationToken();
             String link = generateLink(confirmationToken, user);
@@ -47,7 +48,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     user.getEmail(),
                     emailSenderService.buildEmail(user.getUsername(), link));
 
-            throw new UserNotVerifiedException("You are not verified! You will get a new verification email");
+            throw new UserNotVerifiedException();
         }
         try {
             authenticationManager.authenticate(
@@ -57,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     )
             );
         }catch (BadCredentialsException e){
-            throw new InvalidDataProvidedException("Invalid email or password");
+            throw new InvalidDataProvidedException();
         }
         String userEmail = user.getEmail();
         var jwtToken = jwtUtil.generateToken(userEmail);
@@ -65,16 +66,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public String register(RegisterRequest registerRequest){
+    public String register(RegisterRequest registerRequest) throws UserAlreadyExistException, InvalidDataProvidedException {
         if(isEmailTaken(registerRequest.getEmail())){
-            throw new UserAlreadyExistException("Email is already registered.");
-        }
-        if(!isCredentialsValid(
-                registerRequest.getEmail(),
-                registerRequest.getName(),
-                registerRequest.getPassword(),
-                registerRequest.getConfirmPassword())){
-            throw new InvalidDataProvidedException("Invalid credential data provided");
+            throw new UserAlreadyExistException();
         }
         String confirmedEmail = registerRequest.getEmail().toLowerCase();
         AppUser appUser = new AppUser();
@@ -88,24 +82,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailSenderService.send(
                 confirmedEmail,
                 emailSenderService.buildEmail(registerRequest.getName(), link));
-        return "We have sent you a link to verify your email, please check your email";
+        return "We have sent you a link to " +confirmedEmail+", please check your email";
     }
 
     @Override
     public String confirmToken(String token) throws ConfirmationTokenExpiredException {
         ConfirmationToken confirmationToken = confirmationTokenService
                 .getToken(token)
-                .orElseThrow(() ->
-                        new InvalidDataProvidedException("token not found"));
+                .orElseThrow(InvalidDataProvidedException::new);
 
         if (confirmationToken.getConfirmedAt() != null) {
-            throw new ConfirmationTokenExpiredException("email already confirmed");
+            throw new ConfirmationTokenExpiredException();
         }
 
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
 
         if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new ConfirmationTokenExpiredException("token expired");
+            throw new ConfirmationTokenExpiredException();
         }
 
         confirmationTokenService.setConfirmedAt(token);
@@ -120,15 +113,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         confirmationToken.setCreatedAt(LocalDateTime.now());
         confirmationToken.setExpiresAt(LocalDateTime.now().plusMinutes(5L));
         confirmationTokenService.saveConfirmationToken(confirmationToken);
-        return "http://" +dropletApi+":8080/api/user/confirmToken?token=" + token;
+        return "http://" +mailSenderConfig.getLinkApi()+":8080/api/authentication/confirm?token=" + token;
 
-    }
-    public boolean isCredentialsValid(String email, String name, String password, String confirmPassword){
-        boolean isEmailValid = email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}");
-        boolean isUsernameValid = name.matches("[a-zA-Z\\s]+");
-        boolean isPasswordValid = password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()-_+=]).{8,15}$");
-        boolean passwordsMatch = password.equals(confirmPassword);
-        return isEmailValid && isUsernameValid && isPasswordValid && passwordsMatch;
     }
     public boolean isEmailTaken(String email){
         System.out.println(appUserRepository.existsByEmail(email));

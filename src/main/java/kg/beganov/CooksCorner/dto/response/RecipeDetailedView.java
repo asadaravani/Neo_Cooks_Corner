@@ -1,9 +1,6 @@
 package kg.beganov.CooksCorner.dto.response;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
@@ -12,6 +9,8 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@Builder
 public class RecipeDetailedView {
     Long id;
     String imagePath;

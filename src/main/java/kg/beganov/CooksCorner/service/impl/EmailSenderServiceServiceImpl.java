@@ -2,6 +2,7 @@ package kg.beganov.CooksCorner.service.impl;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import kg.beganov.CooksCorner.config.JavaMailSenderConfig;
 import kg.beganov.CooksCorner.service.EmailSenderService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class EmailSenderServiceServiceImpl implements EmailSenderService {
             .getLogger(EmailSenderServiceServiceImpl.class);
     
     JavaMailSender mailSender;
+    JavaMailSenderConfig mailSenderConfig;
 
     @Override
     @Async
@@ -33,7 +35,7 @@ public class EmailSenderServiceServiceImpl implements EmailSenderService {
             helper.setText(email, true);
             helper.setTo(to);
             helper.setSubject("Confirm your email");
-            helper.setFrom("beganov.asadi@gmail.com");
+            helper.setFrom(mailSenderConfig.getUsername());
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             LOGGER.error("failed to send email", e);

@@ -1,8 +1,10 @@
 package kg.beganov.CooksCorner.service.impl;
 
+import kg.beganov.CooksCorner.dto.response.RecipeDetailedView;
 import kg.beganov.CooksCorner.dto.response.RecipePreview;
 import kg.beganov.CooksCorner.entity.Recipe;
 import kg.beganov.CooksCorner.enums.Category;
+import kg.beganov.CooksCorner.exception.ProductNotFoundException;
 import kg.beganov.CooksCorner.repository.RecipeRepository;
 import kg.beganov.CooksCorner.service.RecipeService;
 import lombok.AccessLevel;
@@ -29,6 +31,21 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public List<RecipePreview> getDinnerRecipes(){
         return mapRecipeToPreview(recipeRepository.findAllByCategory(Category.DINNER));
+    }
+    @Override
+    public RecipeDetailedView getRecipeById(Long id){
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(ProductNotFoundException::new);
+        return RecipeDetailedView.builder()
+                .id(recipe.getId())
+                .imagePath(recipe.getImagePath())
+                .name(recipe.getName())
+                .preparationTime(recipe.getPreparationTime())
+                .author(recipe.getAppUser().getName())
+                .likes(recipe.getLikes())
+                .description(recipe.getDescription())
+                .ingredients(recipe.getIngredients())
+                .build();
     }
 
     private List<RecipePreview> mapRecipeToPreview(List<Recipe> recipes){
