@@ -1,5 +1,6 @@
 package kg.beganov.CooksCorner.dto.request;
 
+import kg.beganov.CooksCorner.dto.IngredientDto;
 import kg.beganov.CooksCorner.enums.Category;
 import kg.beganov.CooksCorner.enums.Difficulty;
 import lombok.AccessLevel;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +20,7 @@ public class RecipeRequest {
     String imagePath;
     String name;
     String description;
-    String ingredients;
+    List<IngredientDto> ingredients;
     Difficulty difficulty;
     Category category;
     String preparationTime;
