@@ -1,36 +1,35 @@
 package kg.beganov.CooksCorner.service.impl;
 
+import kg.beganov.CooksCorner.dto.IngredientDto;
+import kg.beganov.CooksCorner.dto.request.RecipeRequest;
 import kg.beganov.CooksCorner.dto.response.RecipeDetailedView;
 import kg.beganov.CooksCorner.dto.response.RecipePreview;
+import kg.beganov.CooksCorner.entity.Ingredient;
 import kg.beganov.CooksCorner.entity.Recipe;
 import kg.beganov.CooksCorner.enums.Category;
 import kg.beganov.CooksCorner.exception.ProductNotFoundException;
 import kg.beganov.CooksCorner.repository.RecipeRepository;
+import kg.beganov.CooksCorner.service.AppUserService;
+import kg.beganov.CooksCorner.service.IngredientService;
 import kg.beganov.CooksCorner.service.RecipeService;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RecipeServiceImpl implements RecipeService {
     RecipeRepository recipeRepository;
+    AppUserService appUserService;
+    IngredientService ingredientService;
 
     @Override
-    public List<RecipePreview> getBreakfastRecipes(){
-        return mapRecipeToPreview(recipeRepository.findAllByCategory(Category.BREAKFAST));
-    }
-    @Override
-    public List<RecipePreview> getLunchRecipes(){
-        return mapRecipeToPreview(recipeRepository.findAllByCategory(Category.LUNCH));
-    }
-    @Override
-    public List<RecipePreview> getDinnerRecipes(){
-        return mapRecipeToPreview(recipeRepository.findAllByCategory(Category.DINNER));
+    public List<RecipePreview> getRecipesByCategory(Category category){
+        return mapRecipeToPreview(recipeRepository.findAllByCategory(category));
     }
     @Override
     public RecipeDetailedView getRecipeById(Long id){
@@ -44,8 +43,27 @@ public class RecipeServiceImpl implements RecipeService {
                 .author(recipe.getAppUser().getName())
                 .likes(recipe.getLikes())
                 .description(recipe.getDescription())
-                .ingredients(recipe.getIngredients())
+                .ingredients(mapIngredientsToDto(recipe.getIngredients()))
                 .build();
+    }
+    @Override
+    public String addRecipe(RecipeRequest recipeRequest){
+        Recipe recipe = new Recipe();
+        recipe.setAppUser(appUserService.findById(recipeRequest.getAuthorId()));
+        recipe.setImagePath(recipeRequest.getImagePath());
+        recipe.setName(recipeRequest.getName());
+        recipe.setDescription(recipeRequest.getDescription());
+        recipe.setIngredients(mapIngredientDtoToIngredient(recipeRequest.getIngredients(), recipe));
+        recipe.setDifficulty(recipeRequest.getDifficulty());
+        recipe.setCategory(recipeRequest.getCategory());
+        recipe.setPreparationTime(recipeRequest.getPreparationTime());
+        recipeRepository.save(recipe);
+        return "Recipe added successfully";
+    }
+    @Override
+    public String deleteRecipe(Long id){
+        recipeRepository.deleteById(id);
+        return "Recipe deleted successfully";
     }
 
     private List<RecipePreview> mapRecipeToPreview(List<Recipe> recipes){
@@ -61,5 +79,22 @@ public class RecipeServiceImpl implements RecipeService {
             previews.add(preview);
         }
         return previews;
+    }
+    private List<IngredientDto> mapIngredientsToDto(List<Ingredient> ingredients){
+        List<IngredientDto> dtos = new ArrayList<>();
+        for (Ingredient ingredient : ingredients) {
+            IngredientDto dto = new IngredientDto();
+            dto.setKey(ingredient.getKey());
+            dto.setValue(ingredient.getValue());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+    private List<Ingredient> mapIngredientDtoToIngredient(List<IngredientDto> dtos, Recipe recipe){
+        List<Ingredient> ingredients = new ArrayList<>();
+        for (IngredientDto dto : dtos) {
+            ingredients.add(ingredientService.createIngredient(dto, recipe));
+        }
+        return ingredients;
     }
 }

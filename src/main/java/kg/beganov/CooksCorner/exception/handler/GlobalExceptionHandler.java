@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -38,6 +40,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ExceptionResponse handleUserNotVerifiedException(UserNotVerifiedException e) {
         return new ExceptionResponse(HttpStatus.FORBIDDEN, "UserNotVerifiedException",e.getMessage());
+    }
+    @ExceptionHandler(IOException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleIOException(IOException e) {
+        return new ExceptionResponse(HttpStatus.CONFLICT, "IOException","CLOUDINARY: "+e.getMessage());
     }
 
 }

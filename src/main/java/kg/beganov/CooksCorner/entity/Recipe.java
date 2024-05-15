@@ -5,8 +5,10 @@ import kg.beganov.CooksCorner.enums.Category;
 import kg.beganov.CooksCorner.enums.Difficulty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Getter
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SuperBuilder
 public class Recipe extends BaseEntity{
 
     @Column
@@ -37,8 +40,8 @@ public class Recipe extends BaseEntity{
     @Column @Enumerated(EnumType.STRING)
     Category category;
 
-    @Column
-    String ingredients;
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    List<Ingredient> ingredients;
 
     @Column
     BigDecimal likes;
