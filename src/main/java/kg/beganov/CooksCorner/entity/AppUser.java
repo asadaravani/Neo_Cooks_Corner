@@ -34,8 +34,22 @@ public class AppUser extends BaseEntity implements UserDetails {
     @Column
     String bio;
 
-    @OneToMany(mappedBy = "appUser")
+    @OneToMany(mappedBy = "appUser", fetch = FetchType.EAGER)
     List<Recipe> recipes;
+
+    @ManyToMany
+    @JoinTable(
+            name = "saved_recipes",
+            joinColumns = @JoinColumn(name = "app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id"))
+    List<Recipe> savedRecipes;
+
+    @ManyToMany
+    @JoinTable(
+            name = "recipe_likes",
+            joinColumns = @JoinColumn(name = "app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id"))
+    List<Recipe> likedRecipes;
 
     @OneToMany(mappedBy = "appUser")
     List<ConfirmationToken> confirmationTokens;
@@ -43,8 +57,11 @@ public class AppUser extends BaseEntity implements UserDetails {
     @Column @Enumerated(EnumType.STRING)
     Role role;
 
-    @OneToOne
-    AppUserFollow appUserFollow;
+    @OneToMany(mappedBy = "follower", fetch = FetchType.EAGER)
+    List<AppUserFollow> followings;
+
+    @OneToMany(mappedBy = "following", fetch = FetchType.EAGER)
+    List<AppUserFollow> followers;
 
     @Column
     boolean isEmailVerified;

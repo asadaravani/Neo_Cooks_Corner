@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -37,16 +36,17 @@ public class Recipe extends BaseEntity{
     @ManyToOne @JoinColumn(nullable = false, name = "author")
     AppUser appUser;
 
+    @ManyToMany(mappedBy = "savedRecipes")
+    List<AppUser> savedByUsers;
+
+    @ManyToMany(mappedBy = "likedRecipes")
+    List<AppUser> likedByUsers;
+
     @Column @Enumerated(EnumType.STRING)
     Category category;
 
     @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     List<Ingredient> ingredients;
 
-    @Column
-    BigDecimal likes;
-
-    @Column
-    BigDecimal saves;
 
 }

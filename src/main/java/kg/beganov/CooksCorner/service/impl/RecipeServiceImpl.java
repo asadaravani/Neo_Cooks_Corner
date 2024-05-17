@@ -1,22 +1,21 @@
 package kg.beganov.CooksCorner.service.impl;
 
-import kg.beganov.CooksCorner.dto.IngredientDto;
 import kg.beganov.CooksCorner.dto.request.RecipeRequest;
 import kg.beganov.CooksCorner.dto.response.RecipeDetailedView;
 import kg.beganov.CooksCorner.dto.response.RecipePreview;
-import kg.beganov.CooksCorner.entity.Ingredient;
+import kg.beganov.CooksCorner.entity.AppUser;
 import kg.beganov.CooksCorner.entity.Recipe;
 import kg.beganov.CooksCorner.enums.Category;
 import kg.beganov.CooksCorner.exception.ProductNotFoundException;
+import kg.beganov.CooksCorner.mapper.RecipeMapper;
 import kg.beganov.CooksCorner.repository.RecipeRepository;
 import kg.beganov.CooksCorner.service.AppUserService;
-import kg.beganov.CooksCorner.service.IngredientService;
 import kg.beganov.CooksCorner.service.RecipeService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
@@ -25,11 +24,11 @@ import java.util.List;
 public class RecipeServiceImpl implements RecipeService {
     RecipeRepository recipeRepository;
     AppUserService appUserService;
-    IngredientService ingredientService;
+    RecipeMapper recipeMapper;
 
     @Override
     public List<RecipePreview> getRecipesByCategory(Category category){
-        return mapRecipeToPreview(recipeRepository.findAllByCategory(category));
+        return recipeMapper.mapRecipeToPreview(recipeRepository.findAllByCategory(category));
     }
     @Override
     public RecipeDetailedView getRecipeById(Long id){
@@ -41,11 +40,12 @@ public class RecipeServiceImpl implements RecipeService {
                 .name(recipe.getName())
                 .preparationTime(recipe.getPreparationTime())
                 .author(recipe.getAppUser().getName())
-                .likes(recipe.getLikes())
+                .likes((long) recipe.getLikedByUsers().size())
                 .description(recipe.getDescription())
-                .ingredients(mapIngredientsToDto(recipe.getIngredients()))
+                .ingredients(recipeMapper.mapIngredientsToDto(recipe.getIngredients()))
                 .build();
     }
+
     @Override
     public String addRecipe(RecipeRequest recipeRequest){
         Recipe recipe = new Recipe();
@@ -53,7 +53,7 @@ public class RecipeServiceImpl implements RecipeService {
         recipe.setImagePath(recipeRequest.getImagePath());
         recipe.setName(recipeRequest.getName());
         recipe.setDescription(recipeRequest.getDescription());
-        recipe.setIngredients(mapIngredientDtoToIngredient(recipeRequest.getIngredients(), recipe));
+        recipe.setIngredients(recipeMapper.mapIngredientDtoToIngredient(recipeRequest.getIngredients(), recipe));
         recipe.setDifficulty(recipeRequest.getDifficulty());
         recipe.setCategory(recipeRequest.getCategory());
         recipe.setPreparationTime(recipeRequest.getPreparationTime());
@@ -66,35 +66,52 @@ public class RecipeServiceImpl implements RecipeService {
         return "Recipe deleted successfully";
     }
 
-    private List<RecipePreview> mapRecipeToPreview(List<Recipe> recipes){
-        List<RecipePreview> previews = new ArrayList<>();
-        for (Recipe recipe : recipes) {
-            RecipePreview preview = new RecipePreview();
-            preview.setId(recipe.getId());
-            preview.setImagePath(recipe.getImagePath());
-            preview.setName(recipe.getName());
-            preview.setAuthor(recipe.getAppUser().getName());
-            preview.setLikes(recipe.getLikes());
-            preview.setSaves(recipe.getSaves());
-            previews.add(preview);
+    @Override
+    public void saveRecipeByUser(Long recipeId, Long userId){
+        Recipe recipe = findRecipeById(recipeId);
+        AppUser user = appUserService.findById(userId);
+        if(isRecipeSavedByUser(recipeId, userId)){
+            recipe.getSavedByUsers().remove(user);
+            user.getSavedRecipes().remove(recipe);
         }
-        return previews;
+        else {
+            recipe.getSavedByUsers().add(user);
+            user.getSavedRecipes().add(recipe);
+        }
+        recipeRepository.save(recipe);
+        appUserService.save(user);
     }
-    private List<IngredientDto> mapIngredientsToDto(List<Ingredient> ingredients){
-        List<IngredientDto> dtos = new ArrayList<>();
-        for (Ingredient ingredient : ingredients) {
-            IngredientDto dto = new IngredientDto();
-            dto.setKey(ingredient.getKey());
-            dto.setValue(ingredient.getValue());
-            dtos.add(dto);
-        }
-        return dtos;
+    @Override
+    public boolean isRecipeSavedByUser(Long recipeId, Long userId){
+        Recipe recipe = findRecipeById(recipeId);
+        return recipe.getSavedByUsers().stream().anyMatch(user -> user.getId().equals(userId));
     }
-    private List<Ingredient> mapIngredientDtoToIngredient(List<IngredientDto> dtos, Recipe recipe){
-        List<Ingredient> ingredients = new ArrayList<>();
-        for (IngredientDto dto : dtos) {
-            ingredients.add(ingredientService.createIngredient(dto, recipe));
+
+    @Override
+    public void likeRecipeByUser(Long recipeId, Long userId){
+        Recipe recipe = findRecipeById(recipeId);
+        AppUser user = appUserService.findById(userId);
+        if(isRecipeLikedByUser(recipeId, userId)){
+            recipe.getLikedByUsers().remove(user);
+            user.getLikedRecipes().remove(recipe);
         }
-        return ingredients;
+        else {
+            recipe.getLikedByUsers().add(user);
+            user.getLikedRecipes().add(recipe);
+        }
+        recipeRepository.save(recipe);
+        appUserService.save(user);
+    }
+    @Override
+    public boolean isRecipeLikedByUser(Long recipeId, Long userId){
+        Recipe recipe = findRecipeById(recipeId);
+        return recipe.getLikedByUsers().stream().anyMatch(user -> user.getId().equals(userId));
+    }
+    @Override
+    public List<Recipe> findRecipesByNameContaining(String query){
+        return recipeRepository.findByNameContaining(query);
+    }
+    private Recipe findRecipeById(Long id){
+        return recipeRepository.findById(id).orElseThrow(ProductNotFoundException::new);
     }
 }
