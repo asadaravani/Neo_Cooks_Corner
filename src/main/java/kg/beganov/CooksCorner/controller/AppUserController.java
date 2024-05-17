@@ -1,5 +1,51 @@
 package kg.beganov.CooksCorner.controller;
 
-public class AppUserController {
+import io.swagger.v3.oas.annotations.Operation;
+import kg.beganov.CooksCorner.dto.response.RecipePreview;
+import kg.beganov.CooksCorner.dto.response.UserDetailedView;
+import kg.beganov.CooksCorner.service.AppUserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/user")
+public class AppUserController {
+    private final AppUserService appUserService;
+
+    @Operation(summary = "Get User by Email")
+    @GetMapping("/byEmail/{email}")
+    public UserDetailedView getUserByEmail(@PathVariable String email) {
+        return appUserService.getUserByEmail(email);
+    }
+
+    @Operation(summary = "Get User by ID")
+    @GetMapping("/byId/{id}")
+    public UserDetailedView getUserByEmail(@PathVariable Long id) {
+        return appUserService.getUserById(id);
+    }
+
+    @Operation(summary = "Follow User2User")
+    @PostMapping("/follow")
+    public void follow(@RequestParam("followerId") Long followerId,
+                       @RequestParam("followingId") Long followingId) {
+        appUserService.follow(followerId, followingId);
+    }
+
+    @Operation(summary = "Upload Image, max size : 1MB")
+    @PostMapping(value = "/uploadUserImage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String uploadUserImage(@RequestParam("file") MultipartFile file) throws IOException {
+        return appUserService.uploadUserImage(file);
+    }
+
+    @Operation(summary = "Get Recipes by UserID ")
+    @GetMapping("/recipes/{id}")
+    public List<RecipePreview> getUserRecipesById(@PathVariable Long id){
+        return appUserService.getUserRecipesById(id);
+    }
 }

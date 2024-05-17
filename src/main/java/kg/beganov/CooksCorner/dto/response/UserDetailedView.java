@@ -3,16 +3,18 @@ package kg.beganov.CooksCorner.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @AllArgsConstructor
-public class RecipePreview {
+@Getter
+@Setter
+public class UserDetailedView {
     Long id;
     String imagePath;
     String name;
-    String author;
-    Long likes;
-    Long saves;
+    Long recipesCount;
+    Long followersCount;
+    Long followingsCount;
+    String bio;
 }

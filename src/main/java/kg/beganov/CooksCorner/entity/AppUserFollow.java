@@ -2,9 +2,12 @@ package kg.beganov.CooksCorner.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,9 +18,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class AppUserFollow extends BaseEntity{
 
-    @Column
-    Long followingId;
+    @ManyToOne
+    AppUser follower;
 
-    @Column
-    Long followerId;
+    @ManyToOne
+    AppUser following;
+
+    @Column(nullable = false)
+    LocalDateTime followingTime;
+
 }

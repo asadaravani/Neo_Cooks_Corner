@@ -3,7 +3,7 @@ package kg.beganov.CooksCorner.dto.response;
 import kg.beganov.CooksCorner.dto.IngredientDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import java.math.BigDecimal;
+
 import java.util.List;
 
 @Getter
@@ -18,7 +18,7 @@ public class RecipeDetailedView {
     String name;
     String preparationTime;
     String author;
-    BigDecimal likes;
+    Long likes;
     String description;
     List<IngredientDto> ingredients;
 

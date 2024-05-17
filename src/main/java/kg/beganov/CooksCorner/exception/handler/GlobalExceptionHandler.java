@@ -46,5 +46,10 @@ public class GlobalExceptionHandler {
     public ExceptionResponse handleIOException(IOException e) {
         return new ExceptionResponse(HttpStatus.CONFLICT, "IOException","CLOUDINARY: "+e.getMessage());
     }
+    @ExceptionHandler(SearchingErrorException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse handleIOException(SearchingErrorException e) {
+        return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, "SearchingErrorException",e.getMessage());
+    }
 
 }

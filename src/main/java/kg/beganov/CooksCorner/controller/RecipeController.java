@@ -29,8 +29,9 @@ public class RecipeController {
     public List<RecipePreview> getBreakfastRecipes(Category category) {
         return recipeService.getRecipesByCategory(category);
     }
-    @Operation(summary = "Get recipe by ID")
-    @GetMapping("{id}")
+
+    @Operation(summary = "Get recipe by ID", description = "It provides a detailed recipe")
+    @GetMapping("/{id}")
     public RecipeDetailedView getRecipeById(@PathVariable Long id) {
         return recipeService.getRecipeById(id);
     }
@@ -40,20 +41,51 @@ public class RecipeController {
     public String addRecipe(@RequestBody RecipeRequest recipeRequest) {
         return recipeService.addRecipe(recipeRequest);
     }
+
     @Operation(summary = "Upload Image, max size : 1MB")
     @PostMapping(value = "/uploadRecipeImage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String uploadRecipeImage(@RequestParam("file") MultipartFile file) throws IOException {
         return cloudinaryService.uploadImage(file);
     }
+
     @Operation(summary = "Delete recipe by ID")
     @DeleteMapping("{id}")
     public String deleteRecipe(@PathVariable Long id) {
         return recipeService.deleteRecipe(id);
     }
+
     @Operation(summary = "Delete recipe image by URL")
     @DeleteMapping("/deleteRecipeImage")
     public void deleteRecipeImage(String imageURL) throws IOException {
         cloudinaryService.deleteProductImage(imageURL);
     }
+    /*
+    ---------------------------------------------------------------------------------------------
+     */
+    @Operation(summary = "Save recipe by User", description = "It saves/removes")
+    @PostMapping("/{recipeId}/save")
+    public void saveRecipeByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+        recipeService.saveRecipeByUser(recipeId, userId);
+    }
+    @Operation(summary = "Is recipe saved by User?", description = "It is to on/off the 'SAVE' button")
+    @GetMapping("/{recipeId}/isSaved")
+    public boolean isRecipeSavedByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+        return recipeService.isRecipeSavedByUser(recipeId, userId);
+    }
+    /*
+    ---------------------------------------------------------------------------------------------
+     */
+    @Operation(summary = "Like recipe by User", description = "It likes/removes")
+    @PostMapping("/{recipeId}/like")
+    public void likeRecipeByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+        recipeService.likeRecipeByUser(recipeId, userId);
+    }
+    @Operation(summary = "Is recipe liked by User?", description = "It is to on/off the 'Like' button")
+    @GetMapping("/{recipeId}/isLiked")
+    public boolean isRecipeLikedByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+        return recipeService.isRecipeLikedByUser(recipeId, userId);
+    }
+
+
 
 }
