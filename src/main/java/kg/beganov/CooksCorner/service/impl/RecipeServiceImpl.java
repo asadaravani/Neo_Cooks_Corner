@@ -15,7 +15,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -34,30 +33,14 @@ public class RecipeServiceImpl implements RecipeService {
     public RecipeDetailedView getRecipeById(Long id){
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(ProductNotFoundException::new);
-        return RecipeDetailedView.builder()
-                .id(recipe.getId())
-                .imagePath(recipe.getImagePath())
-                .name(recipe.getName())
-                .preparationTime(recipe.getPreparationTime())
-                .author(recipe.getAppUser().getName())
-                .likes((long) recipe.getLikedByUsers().size())
-                .description(recipe.getDescription())
-                .ingredients(recipeMapper.mapIngredientsToDto(recipe.getIngredients()))
-                .build();
+        return recipeMapper.mapRecipeToDetailedView(recipe);
     }
 
     @Override
     public String addRecipe(RecipeRequest recipeRequest){
         Recipe recipe = new Recipe();
-        recipe.setAppUser(appUserService.findById(recipeRequest.getAuthorId()));
-        recipe.setImagePath(recipeRequest.getImagePath());
-        recipe.setName(recipeRequest.getName());
-        recipe.setDescription(recipeRequest.getDescription());
-        recipe.setIngredients(recipeMapper.mapIngredientDtoToIngredient(recipeRequest.getIngredients(), recipe));
-        recipe.setDifficulty(recipeRequest.getDifficulty());
-        recipe.setCategory(recipeRequest.getCategory());
-        recipe.setPreparationTime(recipeRequest.getPreparationTime());
-        recipeRepository.save(recipe);
+        AppUser user = appUserService.findById(recipeRequest.getAuthorId());
+        recipeRepository.save(recipeMapper.mapRecipeRequestToRecipe(recipeRequest, recipe, user));
         return "Recipe added successfully";
     }
     @Override
@@ -109,7 +92,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
     @Override
     public List<Recipe> findRecipesByNameContaining(String query){
-        return recipeRepository.findByNameContaining(query);
+        return recipeRepository.findByNameContainingIgnoreCase(query);
     }
     private Recipe findRecipeById(Long id){
         return recipeRepository.findById(id).orElseThrow(ProductNotFoundException::new);

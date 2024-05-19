@@ -5,7 +5,6 @@ import kg.beganov.CooksCorner.dto.response.RecipeDetailedView;
 import kg.beganov.CooksCorner.dto.response.RecipePreview;
 import kg.beganov.CooksCorner.entity.Recipe;
 import kg.beganov.CooksCorner.enums.Category;
-
 import java.util.List;
 
 public interface RecipeService {

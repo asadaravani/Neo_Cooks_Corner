@@ -37,14 +37,14 @@ public class AppUser extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "appUser", fetch = FetchType.EAGER)
     List<Recipe> recipes;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "saved_recipes",
             joinColumns = @JoinColumn(name = "app_user_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     List<Recipe> savedRecipes;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "recipe_likes",
             joinColumns = @JoinColumn(name = "app_user_id"),

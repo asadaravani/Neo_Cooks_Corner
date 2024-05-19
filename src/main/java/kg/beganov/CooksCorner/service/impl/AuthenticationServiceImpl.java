@@ -117,7 +117,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     }
     public boolean isEmailTaken(String email){
-        System.out.println(appUserRepository.existsByEmail(email));
         return appUserRepository.existsByEmail(email);
     }
 

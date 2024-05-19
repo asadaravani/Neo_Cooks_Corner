@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findUserByEmail(String email);
-    List<AppUser> findByNameContaining(String query);
+    List<AppUser> findByNameContainingIgnoreCase(String query);
 
     @Transactional
     @Modifying
