@@ -1,5 +1,6 @@
 package kg.beganov.CooksCorner.service;
 
+import kg.beganov.CooksCorner.dto.request.AppUserEditRequest;
 import kg.beganov.CooksCorner.dto.response.RecipePreview;
 import kg.beganov.CooksCorner.dto.response.UserDetailedView;
 import kg.beganov.CooksCorner.entity.AppUser;
@@ -15,11 +16,15 @@ public interface AppUserService {
 
     UserDetailedView getUserById(Long id);
 
+    String editAppUserProfile(Long userId, AppUserEditRequest appUserEditRequest);
+
     String uploadUserImage(MultipartFile file) throws IOException;
 
-    void follow(Long followerId, Long followingId);
+    void followAppUser2AppUser(Long followerId, Long followingId);
 
     List<RecipePreview> getUserRecipesById(Long userId);
+
+    boolean isAppUserFollowing2AppUser(Long followerId, Long followingId);
 
     void save(AppUser user);
 

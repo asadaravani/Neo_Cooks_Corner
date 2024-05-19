@@ -51,5 +51,10 @@ public class GlobalExceptionHandler {
     public ExceptionResponse handleIOException(SearchingErrorException e) {
         return new ExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, "SearchingErrorException",e.getMessage());
     }
+    @ExceptionHandler(NoSuchRelationshipException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionResponse handleIOException(NoSuchRelationshipException e) {
+        return new ExceptionResponse(HttpStatus.NOT_FOUND, "NoSuchRelationshipException",e.getMessage());
+    }
 
 }

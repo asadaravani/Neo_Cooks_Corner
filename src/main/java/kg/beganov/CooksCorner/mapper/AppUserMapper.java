@@ -1,10 +1,10 @@
 package kg.beganov.CooksCorner.mapper;
 
+import kg.beganov.CooksCorner.dto.request.AppUserEditRequest;
 import kg.beganov.CooksCorner.dto.response.UserDetailedView;
 import kg.beganov.CooksCorner.dto.response.search.AppUserSearchResult;
 import kg.beganov.CooksCorner.entity.AppUser;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,4 +28,11 @@ public class AppUserMapper {
                         .userName(appUser.getName()).build())
                 .collect(Collectors.toList());
     }
+    public AppUser mapEditRequestToAppUser(AppUserEditRequest editRequest, AppUser user){
+        user.setName(editRequest.getEditedName());
+        user.setBio(editRequest.getEditedBio());
+        user.setAvatarPath(editRequest.getEditedAvatarPath());
+        return user;
+    }
+
 }

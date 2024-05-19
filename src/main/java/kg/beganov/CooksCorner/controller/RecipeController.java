@@ -64,12 +64,12 @@ public class RecipeController {
      */
     @Operation(summary = "Save recipe by User", description = "It saves/removes")
     @PostMapping("/{recipeId}/save")
-    public void saveRecipeByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+    public void saveRecipeByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
         recipeService.saveRecipeByUser(recipeId, userId);
     }
     @Operation(summary = "Is recipe saved by User?", description = "It is to on/off the 'SAVE' button")
     @GetMapping("/{recipeId}/isSaved")
-    public boolean isRecipeSavedByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+    public boolean isRecipeSavedByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
         return recipeService.isRecipeSavedByUser(recipeId, userId);
     }
     /*
@@ -77,12 +77,12 @@ public class RecipeController {
      */
     @Operation(summary = "Like recipe by User", description = "It likes/removes")
     @PostMapping("/{recipeId}/like")
-    public void likeRecipeByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+    public void likeRecipeByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
         recipeService.likeRecipeByUser(recipeId, userId);
     }
     @Operation(summary = "Is recipe liked by User?", description = "It is to on/off the 'Like' button")
     @GetMapping("/{recipeId}/isLiked")
-    public boolean isRecipeLikedByUser(@PathVariable Long recipeId, @RequestParam Long userId){
+    public boolean isRecipeLikedByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
         return recipeService.isRecipeLikedByUser(recipeId, userId);
     }
 

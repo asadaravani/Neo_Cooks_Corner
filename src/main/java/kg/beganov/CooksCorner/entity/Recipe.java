@@ -36,10 +36,10 @@ public class Recipe extends BaseEntity{
     @ManyToOne @JoinColumn(nullable = false, name = "author")
     AppUser appUser;
 
-    @ManyToMany(mappedBy = "savedRecipes")
+    @ManyToMany(mappedBy = "savedRecipes", fetch = FetchType.EAGER)
     List<AppUser> savedByUsers;
 
-    @ManyToMany(mappedBy = "likedRecipes")
+    @ManyToMany(mappedBy = "likedRecipes", fetch = FetchType.EAGER)
     List<AppUser> likedByUsers;
 
     @Column @Enumerated(EnumType.STRING)

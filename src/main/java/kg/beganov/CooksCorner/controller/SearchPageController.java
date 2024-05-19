@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/search")
 public class SearchPageController {
-    SearchPageService searchPageService;
+    private final SearchPageService searchPageService;
     @Operation(summary = "Search by string = userName/recipeName", description = "Returns list of users/recipes or empty list")
     @GetMapping
     public SearchResults searchByQuery(@RequestParam String query){

@@ -17,6 +17,7 @@ public class RecipeDetailedView {
     String imagePath;
     String name;
     String preparationTime;
+    Long authorId;
     String author;
     Long likes;
     String description;
