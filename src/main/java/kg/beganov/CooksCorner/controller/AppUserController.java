@@ -16,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class AppUserController {
+
     private final AppUserService appUserService;
 
     @Operation(summary = "Get User by Email, detailed view")
@@ -55,6 +56,14 @@ public class AppUserController {
     public List<RecipePreview> getUserRecipesById(@PathVariable Long id){
         return appUserService.getUserRecipesById(id);
     }
+
+    @Operation(summary = "Get saved recipes of USER ")
+    @GetMapping("/{id}/saved")
+    public List<RecipePreview> getSavedRecipesById(@PathVariable Long id){
+        return appUserService.getSavedRecipesById(id);
+    }
+
+    @Operation(summary = "Manage profile")
     @PutMapping("/{userId}/edit")
     public String editAppUserProfile(@PathVariable Long userId, @RequestBody AppUserEditRequest editRequest){
         return appUserService.editAppUserProfile(userId, editRequest);

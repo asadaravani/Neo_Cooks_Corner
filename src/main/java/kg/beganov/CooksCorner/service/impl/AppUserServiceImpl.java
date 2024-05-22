@@ -63,6 +63,12 @@ public class AppUserServiceImpl implements AppUserService {
         return recipeMapper.mapRecipeToPreview(user.getRecipes());
     }
     @Override
+    public  List<RecipePreview> getSavedRecipesById(Long userId){
+        AppUser user = findById(userId);
+        return recipeMapper.mapRecipeToPreview(user.getSavedRecipes());
+    }
+
+    @Override
     public void followAppUser2AppUser(Long followerId, Long followingId) {
         AppUser follower = findById(followerId);
         AppUser following = findById(followingId);

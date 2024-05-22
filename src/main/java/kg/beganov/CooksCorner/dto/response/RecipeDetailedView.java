@@ -1,6 +1,7 @@
 package kg.beganov.CooksCorner.dto.response;
 
 import kg.beganov.CooksCorner.dto.IngredientDto;
+import kg.beganov.CooksCorner.enums.Difficulty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,8 +20,11 @@ public class RecipeDetailedView {
     String preparationTime;
     Long authorId;
     String author;
+    boolean isLiked;
+    boolean isSaved;
     Long likes;
     String description;
     List<IngredientDto> ingredients;
+    Difficulty difficulty;
 
 }

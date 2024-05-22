@@ -30,10 +30,10 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeMapper.mapRecipeToPreview(recipeRepository.findAllByCategory(category));
     }
     @Override
-    public RecipeDetailedView getRecipeById(Long id){
+    public RecipeDetailedView getRecipeById(Long id, Long userId){
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(ProductNotFoundException::new);
-        return recipeMapper.mapRecipeToDetailedView(recipe);
+        return recipeMapper.mapRecipeToDetailedView(recipe, isRecipeLikedByUser(recipe, userId), isRecipeSavedByUser(recipe, userId));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class RecipeServiceImpl implements RecipeService {
     public void saveRecipeByUser(Long recipeId, Long userId){
         Recipe recipe = findRecipeById(recipeId);
         AppUser user = appUserService.findById(userId);
-        if(isRecipeSavedByUser(recipeId, userId)){
+        if(isRecipeSavedByUser(recipe, userId)){
             recipe.getSavedByUsers().remove(user);
             user.getSavedRecipes().remove(recipe);
         }
@@ -65,8 +65,7 @@ public class RecipeServiceImpl implements RecipeService {
         appUserService.save(user);
     }
     @Override
-    public boolean isRecipeSavedByUser(Long recipeId, Long userId){
-        Recipe recipe = findRecipeById(recipeId);
+    public boolean isRecipeSavedByUser(Recipe recipe, Long userId){
         return recipe.getSavedByUsers().stream().anyMatch(user -> user.getId().equals(userId));
     }
 
@@ -74,7 +73,7 @@ public class RecipeServiceImpl implements RecipeService {
     public void likeRecipeByUser(Long recipeId, Long userId){
         Recipe recipe = findRecipeById(recipeId);
         AppUser user = appUserService.findById(userId);
-        if(isRecipeLikedByUser(recipeId, userId)){
+        if(isRecipeLikedByUser(recipe, userId)){
             recipe.getLikedByUsers().remove(user);
             user.getLikedRecipes().remove(recipe);
         }
@@ -86,8 +85,7 @@ public class RecipeServiceImpl implements RecipeService {
         appUserService.save(user);
     }
     @Override
-    public boolean isRecipeLikedByUser(Long recipeId, Long userId){
-        Recipe recipe = findRecipeById(recipeId);
+    public boolean isRecipeLikedByUser(Recipe recipe, Long userId){
         return recipe.getLikedByUsers().stream().anyMatch(user -> user.getId().equals(userId));
     }
     @Override

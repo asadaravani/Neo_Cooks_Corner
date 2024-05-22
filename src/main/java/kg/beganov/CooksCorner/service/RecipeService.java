@@ -10,7 +10,7 @@ import java.util.List;
 public interface RecipeService {
     List<RecipePreview> getRecipesByCategory(Category category);
 
-    RecipeDetailedView getRecipeById(Long id);
+    RecipeDetailedView getRecipeById(Long id, Long userId);
 
     String addRecipe(RecipeRequest recipeRequest);
 
@@ -18,11 +18,11 @@ public interface RecipeService {
 
     void saveRecipeByUser(Long recipeId, Long userId);
 
-    boolean isRecipeSavedByUser(Long recipeId, Long userId);
+    boolean isRecipeSavedByUser(Recipe recipe, Long userId);
 
     void likeRecipeByUser(Long userId, Long recipeId);
 
-    boolean isRecipeLikedByUser(Long recipeId, Long userId);
+    boolean isRecipeLikedByUser(Recipe recipe, Long userId);
 
     List<Recipe> findRecipesByNameContaining(String query);
 }
