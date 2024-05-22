@@ -62,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         String userEmail = user.getEmail();
         var jwtToken = jwtUtil.generateToken(userEmail);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).userId(user.getId()).userName(user.getName()).build();
     }
 
     @Override
