@@ -20,6 +20,8 @@ public interface AppUserService {
 
     String uploadUserImage(MultipartFile file) throws IOException;
 
+    List<RecipePreview> getSavedRecipesById(Long userId);
+
     void followAppUser2AppUser(Long followerId, Long followingId);
 
     List<RecipePreview> getUserRecipesById(Long userId);

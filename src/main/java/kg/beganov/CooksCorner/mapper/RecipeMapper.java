@@ -9,6 +9,7 @@ import kg.beganov.CooksCorner.entity.AppUser;
 import kg.beganov.CooksCorner.entity.Ingredient;
 import kg.beganov.CooksCorner.entity.Recipe;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,7 @@ public class RecipeMapper {
                         .recipeName(recipe.getName()).build())
                 .collect(Collectors.toList());
     }
-    public RecipeDetailedView mapRecipeToDetailedView(Recipe recipe){
+    public RecipeDetailedView mapRecipeToDetailedView(Recipe recipe, boolean isLiked, boolean isSaved){
         return RecipeDetailedView.builder()
                 .id(recipe.getId())
                 .imagePath(recipe.getImagePath())
@@ -61,8 +62,11 @@ public class RecipeMapper {
                 .authorId(recipe.getAppUser().getId())
                 .author(recipe.getAppUser().getName())
                 .likes((long) recipe.getLikedByUsers().size())
+                .isLiked(isLiked)
+                .isSaved(isSaved)
                 .description(recipe.getDescription())
                 .ingredients(mapIngredientsToDto(recipe.getIngredients()))
+                .difficulty(recipe.getDifficulty())
                 .build();
     }
     public Recipe mapRecipeRequestToRecipe(RecipeRequest recipeRequest, Recipe recipe, AppUser user) {

@@ -32,8 +32,8 @@ public class RecipeController {
 
     @Operation(summary = "Get recipe by ID", description = "It provides a detailed recipe")
     @GetMapping("/{id}")
-    public RecipeDetailedView getRecipeById(@PathVariable Long id) {
-        return recipeService.getRecipeById(id);
+    public RecipeDetailedView getRecipeById(@PathVariable Long id, @RequestParam Long userId) {
+        return recipeService.getRecipeById(id, userId);
     }
 
     @Operation(summary = "ADD recipe", description = "Difficulty: EASY, MEDIUM, HARD")
@@ -59,31 +59,15 @@ public class RecipeController {
     public void deleteRecipeImage(String imageURL) throws IOException {
         cloudinaryService.deleteProductImage(imageURL);
     }
-    /*
-    ---------------------------------------------------------------------------------------------
-     */
     @Operation(summary = "Save recipe by User", description = "It saves/removes")
     @PostMapping("/{recipeId}/save")
     public void saveRecipeByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
         recipeService.saveRecipeByUser(recipeId, userId);
     }
-    @Operation(summary = "Is recipe saved by User?", description = "It is to on/off the 'SAVE' button")
-    @GetMapping("/{recipeId}/isSaved")
-    public boolean isRecipeSavedByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
-        return recipeService.isRecipeSavedByUser(recipeId, userId);
-    }
-    /*
-    ---------------------------------------------------------------------------------------------
-     */
     @Operation(summary = "Like recipe by User", description = "It likes/removes")
     @PostMapping("/{recipeId}/like")
     public void likeRecipeByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
         recipeService.likeRecipeByUser(recipeId, userId);
-    }
-    @Operation(summary = "Is recipe liked by User?", description = "It is to on/off the 'Like' button")
-    @GetMapping("/{recipeId}/isLiked")
-    public boolean isRecipeLikedByUser(@PathVariable Long recipeId, @RequestParam("userId") Long userId){
-        return recipeService.isRecipeLikedByUser(recipeId, userId);
     }
 
 
